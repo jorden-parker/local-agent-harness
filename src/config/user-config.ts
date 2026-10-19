@@ -7,7 +7,7 @@ export interface UserConfig {
   defaultModel: string | undefined;
 }
 
-export const USER_CONFIG_PATH = join(homedir(), ".config", "harness", "config.json");
+const USER_CONFIG_PATH = join(homedir(), ".config", "harness", "config.json");
 
 export async function loadUserConfig(path = USER_CONFIG_PATH): Promise<UserConfig> {
   const raw = await readFile(path, "utf8").catch(() => "{}");

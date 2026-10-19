@@ -49,7 +49,7 @@ function pathError(call: ToolCall, flags: ConfinementFlags): string | null {
   return null;
 }
 
-export function normaliseRelativePath(path: string): string | null {
+function normaliseRelativePath(path: string): string | null {
   const parts: string[] = [];
   for (const segment of path.split("/")) {
     if (segment === "" || segment === ".") continue;
