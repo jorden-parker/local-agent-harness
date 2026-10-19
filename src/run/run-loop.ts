@@ -34,7 +34,7 @@ export interface RunDeps {
   view: RunView;
 }
 
-const FINAL_ANSWER_REASON = "model gave a final answer";
+export const FINAL_ANSWER_REASON = "model gave a final answer";
 
 export interface RunResult {
   endReason: string;
