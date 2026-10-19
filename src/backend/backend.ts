@@ -18,7 +18,10 @@ export interface ChatRequest {
   numCtx: number;
 }
 
-export type ChatChunk = { type: "text"; text: string } | { type: "tool_call"; call: ToolCall };
+export type ChatChunk =
+  | { type: "text"; text: string }
+  | { type: "thinking"; text: string }
+  | { type: "tool_call"; call: ToolCall };
 
 export interface Backend {
   chat(request: ChatRequest, signal: AbortSignal): AsyncIterable<ChatChunk>;

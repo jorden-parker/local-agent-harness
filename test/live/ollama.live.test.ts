@@ -46,8 +46,10 @@ describe("live Ollama smoke test", () => {
           log,
           view: {
             replyStarted: () => undefined,
+            thinkingText: () => undefined,
             replyText: () => undefined,
             replyEnded: () => undefined,
+            confirmationStarted: () => undefined,
             toolFinished: () => undefined,
           },
         },

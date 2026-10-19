@@ -11,22 +11,22 @@ const plain = (text: string): string => stripVTControlCharacters(text);
 describe("renderPreview", () => {
   it("drops the file headers and keeps the hunk", () => {
     const preview = "Index: a.txt\n====\n--- a.txt\n+++ a.txt\n@@ -1,1 +1,1 @@\n-hello\n+bye\n";
-    expect(plain(renderPreview(preview))).toBe("│  @@ -1,1 +1,1 @@\n│  -hello\n│  +bye");
+    expect(plain(renderPreview(preview))).toBe("│ @@ -1,1 +1,1 @@\n│ -hello\n│ +bye");
   });
 
   it("shows a shell command", () => {
-    expect(plain(renderPreview("$ ls -la"))).toBe("│  $ ls -la");
+    expect(plain(renderPreview("$ ls -la"))).toBe("│ $ ls -la");
   });
 
   it("shows a message that has no hunk", () => {
     expect(plain(renderPreview("edit cannot be applied: see tool result"))).toBe(
-      "│  edit cannot be applied: see tool result",
+      "│ edit cannot be applied: see tool result",
     );
   });
 
   it("keeps a removed line that looks like a file header inside a hunk", () => {
     expect(plain(renderPreview("@@ -1 +1 @@\n--- old\n+new\n"))).toBe(
-      "│  @@ -1 +1 @@\n│  --- old\n│  +new",
+      "│ @@ -1 +1 @@\n│ --- old\n│ +new",
     );
   });
 

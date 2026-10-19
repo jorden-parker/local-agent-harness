@@ -25,8 +25,17 @@ describe("startSpinner", () => {
     for (const write of writes) {
       const plain = stripVTControlCharacters(write);
       expect(plain.startsWith("\r")).toBe(true);
-      expect(plain.endsWith("waiting for model")).toBe(true);
+      expect(plain).toMatch(/waiting for model · 0s$/);
     }
+    stop();
+  });
+
+  it("shows whole seconds waited", () => {
+    const stop = startSpinner((text) => {
+      writes.push(text);
+    });
+    vi.advanceTimersByTime(14_000);
+    expect(stripVTControlCharacters(writes.at(-1) ?? "")).toMatch(/waiting for model · 14s$/);
     stop();
   });
 

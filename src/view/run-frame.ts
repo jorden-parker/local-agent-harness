@@ -3,12 +3,16 @@ import { FINAL_ANSWER_REASON, type RunResult } from "../run/run-loop.js";
 
 const MAX_RULE_WIDTH = 60;
 const SECONDS_PER_MINUTE = 60;
+const BAND_BACKGROUND = "\u001b[48;2;27;33;41m";
+const ERASE_TO_LINE_END = "\u001b[K";
+const DEFAULT_BACKGROUND = "\u001b[49m";
 
 export interface RunHeader {
   model: string;
   backendUrl: string;
   logPath: string;
   task: string;
+  think: boolean;
 }
 
 export function ruleWidth(columns: number | undefined): number {
@@ -16,13 +20,29 @@ export function ruleWidth(columns: number | undefined): number {
 }
 
 export function formatRunHeader(header: RunHeader, width: number): string {
+  const thinking = header.think ? " · thinking on" : "";
   const lines = [
-    `${pc.bold("harness")}${pc.dim(` · ${header.model} via ${header.backendUrl}`)}`,
+    `${pc.bold("harness")}${pc.dim(` · ${header.model} via ${header.backendUrl}${thinking}`)}`,
     pc.dim(`log ${header.logPath}`),
     rule(width),
-    `${pc.cyan(">")} ${header.task}`,
+    "",
+    taskBand(header.task),
   ];
   return `${lines.join("\n")}\n\n`;
+}
+
+function taskBand(task: string): string {
+  return task
+    .split("\n")
+    .map((line, index) =>
+      band(`${index === 0 ? pc.bold(pc.cyan(">")) : " "} ${pc.whiteBright(line)}`),
+    )
+    .join("\n");
+}
+
+function band(line: string): string {
+  if (!pc.isColorSupported) return line;
+  return `${BAND_BACKGROUND}${line}${ERASE_TO_LINE_END}${DEFAULT_BACKGROUND}`;
 }
 
 export function formatRunSummary(result: RunResult, elapsedMs: number, width: number): string {

@@ -42,6 +42,7 @@ const toolCall = (name: "read" | "edit" | "shell", args: Record<string, unknown>
   call: { id: "c", name, arguments: args },
 });
 const text = (value: string): ChatChunk => ({ type: "text", text: value });
+const thinking = (value: string): ChatChunk => ({ type: "thinking", text: value });
 
 beforeEach(async () => {
   target = await realpath(await mkdtemp(join(tmpdir(), "harness-run-")));
@@ -84,6 +85,33 @@ describe("runTask", () => {
       view,
     });
     expect(view.events).toEqual(["reply-started", "text:Hi", "reply-ended"]);
+  });
+
+  it("streams thinking to the view inside the reply", async () => {
+    const backend = new FakeBackend([[thinking("Hmm"), text("Hi")]]);
+    const view = new RecordingView();
+    await runTask("t", "sys", options(), {
+      backend,
+      confirmer: scriptedConfirmer([]),
+      log,
+      view,
+    });
+    expect(view.events).toEqual(["reply-started", "thinking:Hmm", "text:Hi", "reply-ended"]);
+  });
+
+  it("tells the view a Confirmation is starting before the gated tool runs", async () => {
+    const edit = toolCall("edit", { path: "a.txt", old: "hello", new: "bye" });
+    const backend = new FakeBackend([[edit], [text("Done.")]]);
+    const view = new RecordingView();
+    await runTask("t", "sys", options(), {
+      backend,
+      confirmer: scriptedConfirmer(["y"]),
+      log,
+      view,
+    });
+    const gateAt = view.events.indexOf("confirmation-started");
+    expect(gateAt).toBeGreaterThan(-1);
+    expect(view.events[gateAt + 1]).toBe("tool:edit:ok");
   });
 
   it("feeds a decline back to the model and ends after three", async () => {

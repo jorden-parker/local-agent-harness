@@ -20,8 +20,16 @@ export class RecordingView implements RunView {
     this.events.push(`text:${text}`);
   }
 
+  thinkingText(text: string): void {
+    this.events.push(`thinking:${text}`);
+  }
+
   replyEnded(): void {
     this.events.push("reply-ended");
+  }
+
+  confirmationStarted(): void {
+    this.events.push("confirmation-started");
   }
 
   toolFinished(call: ToolCall, outcome: ToolOutcome): void {

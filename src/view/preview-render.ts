@@ -1,6 +1,6 @@
 import pc from "picocolors";
 
-const GUTTER = `${pc.gray("│")}  `;
+const GUTTER = `${pc.gray("│")} `;
 
 export function renderPreview(preview: string): string {
   const lines = dropTrailingEmptyLine(dropFileHeaders(preview.split("\n")));
@@ -17,7 +17,6 @@ function dropTrailingEmptyLine(lines: string[]): string[] {
 }
 
 function colourLine(line: string): string {
-  if (line.startsWith("@@")) return pc.cyan(line);
   if (line.startsWith("+")) return pc.green(line);
   if (line.startsWith("-")) return pc.red(line);
   if (line.startsWith("$ ")) return pc.bold(line);

@@ -5,12 +5,18 @@ import { formatRunHeader, formatRunSummary, ruleWidth } from "../../src/view/run
 const plain = (text: string): string => stripVTControlCharacters(text);
 
 describe("formatRunHeader", () => {
-  it("shows the model, log, rule and task", () => {
-    const header = formatRunHeader(
-      { model: "m", backendUrl: "http://h", logPath: "/l.jsonl", task: "do it" },
-      10,
+  const header = { model: "m", backendUrl: "http://h", logPath: "/l.jsonl", task: "do it" };
+
+  it("shows the model, log, rule and the task after a blank line", () => {
+    expect(plain(formatRunHeader({ ...header, think: false }, 10))).toBe(
+      "harness · m via http://h\nlog /l.jsonl\n──────────\n\n> do it\n\n",
     );
-    expect(plain(header)).toBe("harness · m via http://h\nlog /l.jsonl\n──────────\n> do it\n\n");
+  });
+
+  it("says when thinking is on", () => {
+    expect(plain(formatRunHeader({ ...header, think: true }, 10))).toMatch(
+      /^harness · m via http:\/\/h · thinking on\n/,
+    );
   });
 });
 

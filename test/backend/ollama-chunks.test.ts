@@ -7,6 +7,14 @@ describe("parseOllamaLine", () => {
     expect(parseOllamaLine(line)).toEqual([{ type: "text", text: "Hi" }]);
   });
 
+  it("yields thinking before content", () => {
+    const line = JSON.stringify({ message: { thinking: "Hmm", content: "Hi" }, done: false });
+    expect(parseOllamaLine(line)).toEqual([
+      { type: "thinking", text: "Hmm" },
+      { type: "text", text: "Hi" },
+    ]);
+  });
+
   it("yields tool calls with parsed arguments", () => {
     const line = JSON.stringify({
       message: {

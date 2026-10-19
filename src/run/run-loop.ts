@@ -81,9 +81,7 @@ async function oneTurn(
     numCtx: options.numCtx,
   };
   deps.view.replyStarted();
-  const reply = await collectReply(deps.backend.chat(request, signal), (text) => {
-    deps.view.replyText(text);
-  });
+  const reply = await collectReply(deps.backend.chat(request, signal), deps.view);
   deps.view.replyEnded();
   messages.push({ role: "assistant", content: reply.text, tool_calls: reply.calls });
   await deps.log.record({ event: "assistant", text: reply.text, calls: reply.calls });
@@ -120,7 +118,9 @@ async function resolveGate(
   if (gated.gate.kind === "reject")
     return { state: gated.state, outcome: { ok: false, output: `rejected: ${gated.gate.reason}` } };
   if (gated.gate.kind === "run") return runTool(gated.state, call, options);
-  const choice = await deps.confirmer.confirm(call, await buildPreview(options.target, call));
+  const preview = await buildPreview(options.target, call);
+  deps.view.confirmationStarted();
+  const choice = await deps.confirmer.confirm(call, preview);
   const confirmed = recordConfirmation(gated.state, call, choice);
   if (!confirmed.proceed)
     return {

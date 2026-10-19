@@ -24,7 +24,12 @@ async function main(): Promise<void> {
   const write = (text: string): void => {
     process.stdout.write(text);
   };
-  write(formatRunHeader({ model, backendUrl, logPath: log.path, task: args.task }, width));
+  write(
+    formatRunHeader(
+      { model, backendUrl, logPath: log.path, task: args.task, think: args.runOptions.think },
+      width,
+    ),
+  );
   const startedAt = Date.now();
   const result = await runTask(
     args.task,

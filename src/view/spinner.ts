@@ -6,10 +6,13 @@ const LABEL = "waiting for model";
 const CLEAR_LINE = "\r\u001b[2K";
 
 export function startSpinner(write: (text: string) => void): () => void {
+  const startedAt = Date.now();
   let tick = 0;
   let stopped = false;
   const drawFrame = (): void => {
-    write(pc.dim(`\r${FRAMES[tick % FRAMES.length] ?? ""} ${LABEL}`));
+    const frame = pc.magenta(FRAMES[tick % FRAMES.length] ?? "");
+    const waited = pc.gray(` · ${Math.floor((Date.now() - startedAt) / 1000)}s`);
+    write(`\r${frame} ${pc.dim(LABEL)}${waited}`);
   };
   drawFrame();
   const timer = setInterval(() => {

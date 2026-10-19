@@ -8,7 +8,7 @@ interface OllamaToolCall {
 
 interface OllamaLine {
   error?: string;
-  message?: { content?: string; tool_calls?: OllamaToolCall[] };
+  message?: { thinking?: string; content?: string; tool_calls?: OllamaToolCall[] };
 }
 
 export function parseOllamaLine(line: string): ChatChunk[] {
@@ -17,6 +17,7 @@ export function parseOllamaLine(line: string): ChatChunk[] {
   if (parsed.error !== undefined) throw new Error(`Ollama error: ${parsed.error}`);
   const message = parsed.message ?? {};
   const chunks: ChatChunk[] = [];
+  if (message.thinking) chunks.push({ type: "thinking", text: message.thinking });
   if (message.content) chunks.push({ type: "text", text: message.content });
   for (const raw of message.tool_calls ?? []) {
     const call = toToolCall(raw, chunks.length);
