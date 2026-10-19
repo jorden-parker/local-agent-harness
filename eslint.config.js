@@ -3,7 +3,7 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["node_modules", "prototypes", "docs"] },
+  { ignores: ["node_modules", "prototypes", "docs", ".claude/worktrees"] },
   js.configs.recommended,
   { languageOptions: { globals: globals.node } },
   ...tseslint.configs.strictTypeChecked,
