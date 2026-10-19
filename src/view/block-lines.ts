@@ -42,25 +42,32 @@ export type Block =
   | { kind: "summary"; endReason: string; iterations: number; elapsedMs: number; width: number };
 
 type BlockOf<K extends Block["kind"]> = Extract<Block, { kind: K }>;
-type BlockRenderers = { [K in Block["kind"]]: (block: BlockOf<K>, toggles: Toggles) => Line[] };
+type BlockRenderers = {
+  [K in Block["kind"]]: (block: BlockOf<K>, toggles: Toggles, columns: number) => Line[];
+};
 
 const SILENT_SUCCESS_TOOLS: readonly ToolName[] = ["write", "edit"];
 const TOOL_OUTPUT_GUTTER: Span[] = [INDENT, RULE_GUTTER];
 const SECONDS_PER_MINUTE = 60;
+const DEFAULT_COLUMNS = 80;
 
 const BLOCK_RENDERERS: BlockRenderers = {
   header: headerLines,
   task: (block) => taskLines(block.text),
-  thinking: (block, toggles) => thinkingLines(block.text, toggles.thinking),
-  reply: (block) => markdownLines(REPLY_MARKER, block.text),
+  thinking: (block, toggles, columns) => thinkingLines(block.text, toggles.thinking, columns),
+  reply: (block, _toggles, columns) => markdownLines(REPLY_MARKER, block.text, {}, columns),
   tool: (block, toggles) => toolLines(block, toggles.toolOutput),
   gate: gateLines,
   summary: summaryLines,
 };
 
-export function blockLines(block: Block, toggles: Toggles): Line[] {
-  const render = BLOCK_RENDERERS[block.kind] as (block: Block, toggles: Toggles) => Line[];
-  return render(block, toggles);
+export function blockLines(block: Block, toggles: Toggles, columns = DEFAULT_COLUMNS): Line[] {
+  const render = BLOCK_RENDERERS[block.kind] as (
+    block: Block,
+    toggles: Toggles,
+    columns: number,
+  ) => Line[];
+  return render(block, toggles, columns);
 }
 
 export function choiceLabel(choice: ConfirmationChoice, toolName: ToolName): string {
@@ -74,10 +81,10 @@ export function previewLines(preview: string): Line[] {
   return rows.map((row) => ({ gutter: [RULE_GUTTER], body: [previewSpan(row)] }));
 }
 
-export function streamLines(kind: "thinking" | "reply", text: string): Line[] {
+export function streamLines(kind: "thinking" | "reply", text: string, columns: number): Line[] {
   return kind === "thinking"
-    ? markdownLines(THINKING_MARKER, text, THINKING_STYLE)
-    : markdownLines(REPLY_MARKER, text);
+    ? markdownLines(THINKING_MARKER, text, THINKING_STYLE, columns)
+    : markdownLines(REPLY_MARKER, text, {}, columns);
 }
 
 function headerLines(block: BlockOf<"header">): Line[] {
@@ -103,8 +110,8 @@ function taskLines(text: string): Line[] {
   }));
 }
 
-function thinkingLines(text: string, shown: boolean): Line[] {
-  if (shown) return streamLines("thinking", text);
+function thinkingLines(text: string, shown: boolean, columns: number): Line[] {
+  if (shown) return streamLines("thinking", text, columns);
   return [
     {
       gutter: [THINKING_MARKER],

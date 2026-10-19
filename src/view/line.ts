@@ -48,3 +48,14 @@ export function blankLines(count: number): Line[] {
 export function gutterOnlyLine(span: Span): Line {
   return { gutter: [span], body: [{ text: " " }] };
 }
+
+export function splitRows(spans: Span[]): Span[][] {
+  const rows: Span[][] = [[]];
+  for (const span of spans) {
+    span.text.split("\n").forEach((part, index) => {
+      if (index > 0) rows.push([]);
+      if (part !== "") rows.at(-1)?.push({ ...span, text: part });
+    });
+  }
+  return rows;
+}

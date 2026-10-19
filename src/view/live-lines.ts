@@ -6,8 +6,11 @@ import {
   type Toggles,
 } from "./block-lines.js";
 import { CHOICE_ORDER } from "../gate/confirmation-keys.js";
+import { openTableRows, settledMarkdownRows } from "./markdown-lines.js";
 import {
   blankLines,
+  INDENT,
+  REPLY_MARKER,
   blankLinesBefore,
   gutterOnlyLine,
   RULE_GUTTER,
@@ -27,6 +30,7 @@ export type Live =
 
 export interface LiveContext {
   toggles: Toggles;
+  columns: number;
   lastKind: BlockKind | undefined;
   frame: number;
   now: number;
@@ -34,6 +38,11 @@ export interface LiveContext {
 
 type LiveOf<K extends Live["kind"]> = Extract<Live, { kind: K }>;
 type LiveRenderers = { [K in Live["kind"]]: (live: LiveOf<K>, context: LiveContext) => Line[] };
+
+const STREAM_MARKERS: Readonly<Record<StreamKind, Span>> = {
+  thinking: THINKING_MARKER,
+  reply: REPLY_MARKER,
+};
 
 const SPINNER_FRAMES = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
 
@@ -101,5 +110,17 @@ function liveStreamLines(live: LiveOf<"stream">, context: LiveContext): Line[] {
         body: [{ text: `thinking… ${live.text.length} chars`, dim: true }],
       },
     ];
-  return streamLines(live.stream, live.text).slice(live.committedRows);
+  const rows = streamLines(live.stream, live.text, context.columns);
+  const tableRows = openTableRows(live.text);
+  if (tableRows === null) return rows.slice(live.committedRows);
+  const settled = settledMarkdownRows(live.text, context.columns);
+  const marker = settled === 0 ? STREAM_MARKERS[live.stream] : INDENT;
+  const placeholder: Line = {
+    gutter: [marker],
+    body: [
+      { text: "▦ ", color: "gray" },
+      { text: `table · ${tableRows} rows so far`, dim: true },
+    ],
+  };
+  return [...rows.slice(live.committedRows, settled), placeholder];
 }

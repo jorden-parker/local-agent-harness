@@ -10,6 +10,11 @@ describe("wrapLine", () => {
     expect(linesText(wrapLine(reply("short"), 20))).toEqual(["● short"]);
   });
 
+  it("keeps trailing spaces on a row that fits so padding survives", () => {
+    const padded: Line = { gutter: [], body: [{ text: "ab" }, { text: "   " }] };
+    expect(linesText(wrapLine(padded, 10))).toEqual(["ab   "]);
+  });
+
   it("hangs continuation rows under the text and drops the space it broke on", () => {
     expect(linesText(wrapLine(reply("alpha beta gamma delta"), 14))).toEqual([
       "● alpha beta",

@@ -48,7 +48,10 @@ function fillRows(all: Piece[], bodyWidth: number): Span[][] {
     rows.at(-1)?.push(piece);
     used += pieceWidth;
   }
-  return rows.map(trimTrailingSpace).map(mergeSpans);
+  const lastRow = rows.length - 1;
+  return rows
+    .map((row, index) => (index === lastRow ? row : trimTrailingSpace(row)))
+    .map(mergeSpans);
 }
 
 function trimTrailingSpace(row: Piece[]): Piece[] {

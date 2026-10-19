@@ -45,6 +45,15 @@ describe("RunStore streaming", () => {
     expect(committed(store)).toEqual(["● 1", "  2"]);
   });
 
+  it("keeps a streaming table out of scrollback until it is complete", () => {
+    const store = new RunStore();
+    store.startWaiting(0);
+    store.streamText("reply", "| a |\n|---|\n| 1 |\n| 2 |\n| 3 |\n| 4 |\n| 5 |");
+    expect(committed(store)).toEqual([]);
+    store.endReply();
+    expect(committed(store)[0]).toBe("● ╭───╮");
+  });
+
   it("drops blank lines the model sends before its text", () => {
     const store = new RunStore();
     reply(store, "\n\n", "  Hi");

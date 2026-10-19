@@ -5,6 +5,7 @@ import { linesText } from "./line-text.js";
 
 const context: LiveContext = {
   toggles: { thinking: true, toolOutput: false },
+  columns: 80,
   lastKind: "reply",
   frame: 2,
   now: 14_500,
@@ -27,6 +28,12 @@ describe("liveLines", () => {
   it("shows only the rows not yet committed", () => {
     const live = { kind: "stream", stream: "reply", text: "one\ntw", committedRows: 1 } as const;
     expect(linesText(liveLines(live, context))).toEqual(["  tw"]);
+  });
+
+  it("shows a placeholder row while a table is streaming", () => {
+    const text = "| a |\n|---|\n| 1 |";
+    const live = { kind: "stream", stream: "reply", text, committedRows: 0 } as const;
+    expect(linesText(liveLines(live, context))).toEqual(["● ▦ table · 2 rows so far"]);
   });
 
   it("shows a running count while thinking is hidden", () => {

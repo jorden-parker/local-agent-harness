@@ -28,6 +28,12 @@ export interface LiveRegionProps {
 export function LiveRegion({ state, animate, columns }: LiveRegionProps) {
   const frame = useSpinnerFrame(animate && state.live.kind === "waiting");
   if (!animate && state.live.kind === "waiting") return null;
-  const context = { toggles: state.toggles, lastKind: state.lastKind, frame, now: Date.now() };
+  const context = {
+    toggles: state.toggles,
+    columns,
+    lastKind: state.lastKind,
+    frame,
+    now: Date.now(),
+  };
   return <Lines lines={liveLines(state.live, context)} columns={columns} />;
 }

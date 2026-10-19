@@ -39,7 +39,7 @@ type GateActionHandlers = {
 const TOGGLE_KEYS: Readonly<Record<string, keyof Toggles>> = { t: "thinking", o: "toolOutput" };
 
 export class InkRunView implements RunView, Confirmer {
-  private readonly store = new RunStore();
+  private readonly store = new RunStore(() => this.terminalColumns());
   private instance: Instance | null = null;
   private answer: ((choice: ConfirmationChoice) => void) | null = null;
 
@@ -51,7 +51,7 @@ export class InkRunView implements RunView, Confirmer {
         store={this.store}
         interactive={this.io.interactive}
         terminalRows={() => this.terminalRows()}
-        terminalColumns={() => this.io.stdout.columns || DEFAULT_COLUMNS}
+        terminalColumns={() => this.terminalColumns()}
         onInput={(input, key, rows) => {
           this.handleInput(input, key, rows);
         }}
@@ -200,6 +200,10 @@ export class InkRunView implements RunView, Confirmer {
     this.instance?.clear();
     this.io.stdout.write(LEAVE_ALTERNATE_SCREEN);
     this.store.closeTranscript();
+  }
+
+  private terminalColumns(): number {
+    return this.io.stdout.columns || DEFAULT_COLUMNS;
   }
 
   private terminalRows(): number {

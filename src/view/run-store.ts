@@ -7,7 +7,7 @@ import {
   type Toggles,
 } from "./block-lines.js";
 import { blankLines, blankLinesBefore, SPACING, type BlockKind, type Line } from "./line.js";
-import { settledMarkdownRows } from "./markdown-lines.js";
+import { openTableRows, settledMarkdownRows } from "./markdown-lines.js";
 import { gateQuestionLines, pendingGateLines, type Live, type StreamKind } from "./live-lines.js";
 import { CHOICE_ORDER } from "../gate/confirmation-keys.js";
 
@@ -29,13 +29,17 @@ export interface RunViewState {
 
 const EXPANDED: Toggles = { thinking: true, toolOutput: true };
 const IDLE: Live = { kind: "idle" };
+const DEFAULT_COLUMNS = 80;
 
 export class RunStore {
   private state: RunViewState;
   private readonly listeners = new Set<() => void>();
   private nextKey = 0;
 
-  constructor(toggles: Toggles = { thinking: true, toolOutput: false }) {
+  constructor(
+    private readonly columns: () => number = () => DEFAULT_COLUMNS,
+    toggles: Toggles = { thinking: true, toolOutput: false },
+  ) {
     this.state = {
       committed: [],
       blocks: [],
@@ -131,7 +135,7 @@ export class RunStore {
   transcriptLines(): Line[] {
     return this.state.blocks.flatMap((block, index) => [
       ...blankLines(blankLinesBefore(this.state.blocks[index - 1]?.kind, block.kind)),
-      ...blockLines(fullBlock(block), EXPANDED),
+      ...blockLines(fullBlock(block), EXPANDED, this.columns()),
     ]);
   }
 
@@ -142,8 +146,13 @@ export class RunStore {
 
   private commitFinishedRows(stream: StreamKind, text: string, committedRows: number): number {
     if (!this.isShown(stream)) return committedRows;
-    const rows = streamLines(stream, text);
-    const settled = Math.max(settledMarkdownRows(text), rows.length - SPACING.liveStreamRows);
+    const columns = this.columns();
+    const rows = streamLines(stream, text, columns);
+    const complete = settledMarkdownRows(text, columns);
+    const settled =
+      openTableRows(text) === null
+        ? Math.max(complete, rows.length - SPACING.liveStreamRows)
+        : complete;
     const finished = rows.slice(committedRows, Math.max(committedRows, settled));
     this.commit(finished);
     return committedRows + finished.length;
@@ -168,7 +177,7 @@ export class RunStore {
 
   private finishBlock(block: Block, alreadyCommittedRows: number): void {
     this.update({ blocks: [...this.state.blocks, block] });
-    this.commit(blockLines(block, this.state.toggles).slice(alreadyCommittedRows));
+    this.commit(blockLines(block, this.state.toggles, this.columns()).slice(alreadyCommittedRows));
   }
 
   private commit(lines: Line[]): void {
