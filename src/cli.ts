@@ -4,6 +4,7 @@ import { OllamaBackend } from "./backend/ollama-backend.js";
 import { parseCliArgs } from "./cli-args.js";
 import { assertBackendAllowed } from "./config/backend-url.js";
 import { chooseModel } from "./config/model-choice.js";
+import { chooseTargetDirectory } from "./config/target-choice.js";
 import { loadUserConfig } from "./config/user-config.js";
 import { prepareTargetDirectory } from "./git/target-directory.js";
 import { openRunLog } from "./log/run-log.js";
@@ -20,7 +21,10 @@ async function main(): Promise<void> {
   const config = await loadUserConfig();
   const model = chooseModel(args.model, config.defaultModel);
   const backendUrl = assertBackendAllowed(args.backend, config.allowedBackendHosts);
-  const target = await prepareTargetDirectory(process.cwd(), args.allowDirty);
+  const target = await prepareTargetDirectory(
+    chooseTargetDirectory(process.env, process.cwd()),
+    args.allowDirty,
+  );
   const log = await openRunLog(target, new Date());
   const systemPrompt = await buildSystemPrompt(target);
   const view = new InkRunView({

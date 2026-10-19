@@ -6,11 +6,20 @@ See `GLOSSARY.md` for the vocabulary used in the code.
 
 ## Run
 
+Once, in this checkout:
+
 ```sh
 pnpm install
-cd /path/to/some/git/repo
-/path/to/local-agent-harness/bin/harness.js "make the failing test pass"
+pnpm link        # puts `harness` on PATH; run `pnpm setup` first if pnpm reports no global bin directory
 ```
+
+Then, from any git repository:
+
+```sh
+harness "make the failing test pass"
+```
+
+Without linking, `pnpm -C /path/to/local-agent-harness harness "task"` does the same and targets the directory you ran it from.
 
 Flags:
 
