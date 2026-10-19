@@ -27,7 +27,14 @@ async function main(): Promise<void> {
       backend: new OllamaBackend(backendUrl),
       confirmer: new TerminalConfirmer(),
       log,
-      out: (text) => process.stdout.write(text),
+      view: {
+        replyStarted: () => undefined,
+        replyText: (text) => {
+          process.stdout.write(text);
+        },
+        replyEnded: () => undefined,
+        toolFinished: () => undefined,
+      },
     },
   );
   process.stdout.write(
