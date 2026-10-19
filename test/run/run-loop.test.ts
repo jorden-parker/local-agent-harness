@@ -8,6 +8,7 @@ import type { RunLog } from "../../src/log/run-log.js";
 import { runTask, type RunOptions } from "../../src/run/run-loop.js";
 import type { ConfirmationChoice } from "../../src/run/run-state.js";
 import { FakeBackend } from "../backend/fake-backend.js";
+import { RecordingView } from "../view/recording-view.js";
 
 let target: string;
 let entries: Record<string, unknown>[];
@@ -55,12 +56,12 @@ describe("runTask", () => {
       [toolCall("edit", { path: "a.txt", old: "hello", new: "bye" })],
       [text("Done.")],
     ]);
-    const output: string[] = [];
+    const view = new RecordingView();
     const result = await runTask("change hello to bye", "sys", options(), {
       backend,
       confirmer: scriptedConfirmer(["y"]),
       log,
-      out: (t) => output.push(t),
+      view,
     });
     expect(result).toEqual({ endReason: "model gave a final answer", iterations: 2 });
     expect(await readFile(join(target, "a.txt"), "utf8")).toBe("bye\n");
@@ -69,7 +70,20 @@ describe("runTask", () => {
       content: "hello\n",
       tool_name: "read",
     });
-    expect(output.join("")).toContain("Done.");
+    expect(view.text).toContain("Done.");
+    expect(view.events).toContain("tool:edit:ok");
+  });
+
+  it("brackets each reply with replyStarted and replyEnded", async () => {
+    const backend = new FakeBackend([[text("Hi")]]);
+    const view = new RecordingView();
+    await runTask("t", "sys", options(), {
+      backend,
+      confirmer: scriptedConfirmer([]),
+      log,
+      view,
+    });
+    expect(view.events).toEqual(["reply-started", "text:Hi", "reply-ended"]);
   });
 
   it("feeds a decline back to the model and ends after three", async () => {
@@ -79,7 +93,7 @@ describe("runTask", () => {
       backend,
       confirmer: scriptedConfirmer(["n", "n", "n"]),
       log,
-      out: () => undefined,
+      view: new RecordingView(),
     });
     expect(result.endReason).toBe("three consecutive tool failures");
     expect(backend.requests[1]?.messages.at(-1)).toEqual({
@@ -95,7 +109,7 @@ describe("runTask", () => {
       backend,
       confirmer: scriptedConfirmer([]),
       log,
-      out: () => undefined,
+      view: new RecordingView(),
     });
     expect(result.endReason).toBe("model gave a final answer");
     expect(backend.requests[1]?.messages.at(-1)).toEqual({
@@ -111,7 +125,7 @@ describe("runTask", () => {
       backend,
       confirmer: scriptedConfirmer([]),
       log,
-      out: () => undefined,
+      view: new RecordingView(),
     });
     expect(result.endReason).toMatch(/backend error: FakeBackend has no scripted turn left/);
     expect(entries.at(-1)).toMatchObject({ event: "end" });

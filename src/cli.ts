@@ -9,6 +9,8 @@ import { prepareTargetDirectory } from "./git/target-directory.js";
 import { openRunLog } from "./log/run-log.js";
 import { buildSystemPrompt } from "./prompt/system-prompt.js";
 import { runTask } from "./run/run-loop.js";
+import { formatRunHeader, formatRunSummary, ruleWidth } from "./view/run-frame.js";
+import { TerminalRunView } from "./view/terminal-run-view.js";
 
 async function main(): Promise<void> {
   const args = parseCliArgs(process.argv.slice(2));
@@ -18,7 +20,12 @@ async function main(): Promise<void> {
   const target = await prepareTargetDirectory(process.cwd(), args.allowDirty);
   const log = await openRunLog(target, new Date());
   const systemPrompt = await buildSystemPrompt(target);
-  process.stdout.write(pc.dim(`model ${model} via ${backendUrl}, log ${log.path}\n\n`));
+  const width = ruleWidth(process.stdout.columns);
+  const write = (text: string): void => {
+    process.stdout.write(text);
+  };
+  write(formatRunHeader({ model, backendUrl, logPath: log.path, task: args.task }, width));
+  const startedAt = Date.now();
   const result = await runTask(
     args.task,
     systemPrompt,
@@ -27,12 +34,10 @@ async function main(): Promise<void> {
       backend: new OllamaBackend(backendUrl),
       confirmer: new TerminalConfirmer(),
       log,
-      out: (text) => process.stdout.write(text),
+      view: new TerminalRunView(write, process.stdout.isTTY),
     },
   );
-  process.stdout.write(
-    pc.dim(`\n\nrun ended: ${result.endReason} after ${result.iterations} tool calls\n`),
-  );
+  write(formatRunSummary(result, Date.now() - startedAt, width));
 }
 
 main().catch((error: unknown) => {

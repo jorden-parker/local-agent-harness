@@ -44,7 +44,12 @@ describe("live Ollama smoke test", () => {
           backend: new OllamaBackend("http://localhost:11434"),
           confirmer: { confirm: () => Promise.resolve("y") },
           log,
-          out: () => undefined,
+          view: {
+            replyStarted: () => undefined,
+            replyText: () => undefined,
+            replyEnded: () => undefined,
+            toolFinished: () => undefined,
+          },
         },
       );
       expect(await readFile(join(target, "greeting.txt"), "utf8")).toContain("goodbye");

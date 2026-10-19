@@ -4,7 +4,8 @@ import { buildPreview } from "../gate/preview.js";
 import type { RunLog } from "../log/run-log.js";
 import { executeTool, type ToolOutcome } from "../tools/execute-tool.js";
 import { TOOL_DEFINITIONS } from "../tools/tool-definitions.js";
-import { describeToolCall, type ToolCall } from "../tools/tool-call.js";
+import type { ToolCall } from "../tools/tool-call.js";
+import type { RunView } from "../view/run-view.js";
 import { collectReply } from "./collect-reply.js";
 import {
   gateToolCall,
@@ -30,8 +31,10 @@ export interface RunDeps {
   backend: Backend;
   confirmer: Confirmer;
   log: RunLog;
-  out: (text: string) => void;
+  view: RunView;
 }
+
+export const FINAL_ANSWER_REASON = "model gave a final answer";
 
 export interface RunResult {
   endReason: string;
@@ -77,10 +80,14 @@ async function oneTurn(
     think: options.think,
     numCtx: options.numCtx,
   };
-  const reply = await collectReply(deps.backend.chat(request, signal), deps.out);
+  deps.view.replyStarted();
+  const reply = await collectReply(deps.backend.chat(request, signal), (text) => {
+    deps.view.replyText(text);
+  });
+  deps.view.replyEnded();
   messages.push({ role: "assistant", content: reply.text, tool_calls: reply.calls });
   await deps.log.record({ event: "assistant", text: reply.text, calls: reply.calls });
-  if (reply.calls.length === 0) return { ...state, endReason: "model gave a final answer" };
+  if (reply.calls.length === 0) return { ...state, endReason: FINAL_ANSWER_REASON };
   let next = state;
   for (const call of reply.calls) {
     if (next.endReason !== null) break;
@@ -98,7 +105,7 @@ async function handleToolCall(
 ): Promise<RunState> {
   const gated = gateToolCall(state, call);
   const { state: afterGate, outcome } = await resolveGate(gated, call, options, deps);
-  deps.out(formatOutcome(call, outcome));
+  deps.view.toolFinished(call, outcome);
   messages.push({ role: "tool", content: outcome.output, tool_name: call.name });
   await deps.log.record({ event: "tool", call, ...outcome });
   return afterGate;
@@ -130,12 +137,6 @@ async function runTool(
 ): Promise<{ state: RunState; outcome: ToolOutcome }> {
   const outcome = await executeTool(options.target, call);
   return { state: recordToolOutcome(state, outcome.ok), outcome };
-}
-
-function formatOutcome(call: ToolCall, outcome: ToolOutcome): string {
-  const marker = outcome.ok ? "✓" : "✗";
-  const firstLine = outcome.output.split("\n")[0] ?? "";
-  return `\n${marker} ${describeToolCall(call)}${outcome.ok ? "" : ` → ${firstLine}`}\n`;
 }
 
 function errorMessage(error: unknown): string {
