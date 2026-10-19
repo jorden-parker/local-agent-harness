@@ -7,22 +7,19 @@
 > in `plans/README.md` — unless a reviewer dispatched you and told you they
 > maintain the index.
 >
-> **Drift check (run first)**: this plan was written against commit `e9b89ce`
-> **plus an uncommitted rename of every file to kebab-case** (e.g.
-> `src/run/runLoop.ts` → `src/run/run-loop.ts`). Run:
-> `ls src/run/run-loop.ts src/gate/terminal-confirmer.ts src/cli.ts test/run/run-loop.test.ts`
-> All four must exist. If any is missing, STOP (the rename has not landed in
-> your checkout). Then compare every "Current state" excerpt below against the
-> live file; on any mismatch, STOP.
+> **Drift check (run first)**:
+> `git diff --stat 41c3f3e..HEAD -- src/run/run-loop.ts src/gate/terminal-confirmer.ts src/cli.ts test/run/run-loop.test.ts test/live/ollama.live.test.ts`
+> If any in-scope file changed since this plan was written, compare every
+> "Current state" excerpt below against the live file; on any mismatch, STOP.
 
 ## Status
 
 - **Priority**: P2
 - **Effort**: M
 - **Risk**: LOW (presentation only; Run behaviour, gate rules and logs are unchanged)
-- **Depends on**: none (but the kebab-case rename must be committed first; see drift check)
+- **Depends on**: none
 - **Category**: direction (UI design) + tech-debt
-- **Planned at**: commit `e9b89ce` + uncommitted kebab-case rename, 2026-10-19
+- **Planned at**: commit `41c3f3e`, 2026-10-19
 
 ## Why this matters
 
@@ -274,7 +271,7 @@ Use `pnpm`, never `npm`.
 ## Git workflow
 
 - Branch: `advisor/001-inline-run-view`.
-- One commit per step is fine. Message style matches the repo: a short imperative sentence, e.g. `Add RunView and route tool results through it`. Add a `Co-Authored-By:` trailer only if your operator tells you to.
+- One commit per step is fine. Messages must be Conventional Commits (a commitlint hook rejects anything else), e.g. `feat: add RunView and route tool results through it`. The pre-commit hook also runs eslint, prettier and `tsc --noEmit` on staged files, so each commit must typecheck. Never use `--no-verify`. Add a `Co-Authored-By:` trailer only if your operator tells you to.
 - Do NOT push or open a PR unless the operator instructed it.
 
 ## Steps
@@ -537,7 +534,7 @@ Run `pnpm format`, then:
 - `pnpm lint` → exit 0
 - `pnpm test` → all pass. That is 51 tests from step 2 + 6 + 3 + 5 + 4 + 5 + 5 = 79, give or take if you split cases differently. None fail.
 - `grep -rn "formatOutcome\|colourPreview\|deps.out\|out:" src test` → no matches
-- `grep -rn "//\|/\*" src/view test/view` → no matches (no comments)
+- `grep -rnE "^\s*(//|/\*|\*)" src/view test/view` → no matches (no comments)
 
 ### Step 11: Live check (manual, only if a Backend is available)
 
