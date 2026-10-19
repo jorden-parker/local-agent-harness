@@ -1,0 +1,16 @@
+{
+  "name": "ink-run-view-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx spike.tsx"
+  },
+  "dependencies": {
+    "ink": "8.0.0",
+    "react": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0",
+    "tsx": "^4.23.15"
+  }
+}
