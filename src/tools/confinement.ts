@@ -1,4 +1,4 @@
-import { stringArgument, type ToolCall } from "./toolCall.js";
+import { stringArgument, type ToolCall } from "./tool-call.js";
 
 export interface ConfinementFlags {
   allowSecrets: boolean;

@@ -1,5 +1,5 @@
 import type { ChatChunk } from "../backend/backend.js";
-import type { ToolCall } from "../tools/toolCall.js";
+import type { ToolCall } from "../tools/tool-call.js";
 
 export interface AssistantReply {
   text: string;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ChatChunk } from "../../src/backend/backend.js";
-import { collectReply } from "../../src/run/collectReply.js";
+import { collectReply } from "../../src/run/collect-reply.js";
 
 async function* chunks(...items: ChatChunk[]): AsyncIterable<ChatChunk> {
   yield* items;

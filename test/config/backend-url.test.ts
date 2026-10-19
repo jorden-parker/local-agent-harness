@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { assertBackendAllowed } from "../../src/config/backendUrl.js";
+import { assertBackendAllowed } from "../../src/config/backend-url.js";
 
 describe("assertBackendAllowed", () => {
   it("accepts localhost", () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { confinementError, type ConfinementFlags } from "../../src/tools/confinement.js";
-import type { ToolCall } from "../../src/tools/toolCall.js";
+import type { ToolCall } from "../../src/tools/tool-call.js";
 
 const strict: ConfinementFlags = { allowSecrets: false };
 

@@ -4,10 +4,10 @@ import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { ChatChunk } from "../../src/backend/backend.js";
 import type { Confirmer } from "../../src/gate/confirmer.js";
-import type { RunLog } from "../../src/log/runLog.js";
-import { runTask, type RunOptions } from "../../src/run/runLoop.js";
-import type { ConfirmationChoice } from "../../src/run/runState.js";
-import { FakeBackend } from "../backend/fakeBackend.js";
+import type { RunLog } from "../../src/log/run-log.js";
+import { runTask, type RunOptions } from "../../src/run/run-loop.js";
+import type { ConfirmationChoice } from "../../src/run/run-state.js";
+import { FakeBackend } from "../backend/fake-backend.js";
 
 let target: string;
 let entries: Record<string, unknown>[];

@@ -1,11 +1,11 @@
 import type { Backend, ChatMessage } from "../backend/backend.js";
 import type { Confirmer } from "../gate/confirmer.js";
 import { buildPreview } from "../gate/preview.js";
-import type { RunLog } from "../log/runLog.js";
-import { executeTool, type ToolOutcome } from "../tools/executeTool.js";
-import { TOOL_DEFINITIONS } from "../tools/toolDefinitions.js";
-import { describeToolCall, type ToolCall } from "../tools/toolCall.js";
-import { collectReply } from "./collectReply.js";
+import type { RunLog } from "../log/run-log.js";
+import { executeTool, type ToolOutcome } from "../tools/execute-tool.js";
+import { TOOL_DEFINITIONS } from "../tools/tool-definitions.js";
+import { describeToolCall, type ToolCall } from "../tools/tool-call.js";
+import { collectReply } from "./collect-reply.js";
 import {
   gateToolCall,
   initialRunState,
@@ -14,7 +14,7 @@ import {
   type RunFlags,
   type RunLimits,
   type RunState,
-} from "./runState.js";
+} from "./run-state.js";
 
 export interface RunOptions {
   target: string;

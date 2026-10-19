@@ -2,8 +2,8 @@ import { mkdtemp, realpath, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import { executeTool } from "../../src/tools/executeTool.js";
-import type { ToolCall } from "../../src/tools/toolCall.js";
+import { executeTool } from "../../src/tools/execute-tool.js";
+import type { ToolCall } from "../../src/tools/tool-call.js";
 
 let target: string;
 

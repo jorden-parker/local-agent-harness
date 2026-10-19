@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
-import { OllamaBackend } from "../../src/backend/ollamaBackend.js";
-import { openRunLog } from "../../src/log/runLog.js";
-import { buildSystemPrompt } from "../../src/prompt/systemPrompt.js";
-import { runTask } from "../../src/run/runLoop.js";
+import { OllamaBackend } from "../../src/backend/ollama-backend.js";
+import { openRunLog } from "../../src/log/run-log.js";
+import { buildSystemPrompt } from "../../src/prompt/system-prompt.js";
+import { runTask } from "../../src/run/run-loop.js";
 
 const run = promisify(execFile);
 const MODEL = process.env["HARNESS_LIVE_MODEL"] ?? "qwen3:4b";

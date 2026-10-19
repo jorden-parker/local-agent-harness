@@ -5,8 +5,8 @@ import {
   recordConfirmation,
   recordToolOutcome,
   type RunState,
-} from "../../src/run/runState.js";
-import type { ToolCall } from "../../src/tools/toolCall.js";
+} from "../../src/run/run-state.js";
+import type { ToolCall } from "../../src/tools/tool-call.js";
 
 const read: ToolCall = { id: "1", name: "read", arguments: { path: "a.ts" } };
 const edit: ToolCall = { id: "2", name: "edit", arguments: { path: "a.ts" } };

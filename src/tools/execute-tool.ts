@@ -1,9 +1,9 @@
-import { editTool, readTool, writeTool } from "./fileTools.js";
-import { globTool, grepTool } from "./searchTools.js";
-import { shellTool } from "./shellTool.js";
-import { ToolError } from "./targetPath.js";
-import type { ToolCall, ToolName } from "./toolCall.js";
-import { truncateToolOutput } from "./toolOutput.js";
+import { editTool, readTool, writeTool } from "./file-tools.js";
+import { globTool, grepTool } from "./search-tools.js";
+import { shellTool } from "./shell-tool.js";
+import { ToolError } from "./target-path.js";
+import type { ToolCall, ToolName } from "./tool-call.js";
+import { truncateToolOutput } from "./tool-output.js";
 
 type ToolRunner = (target: string, call: ToolCall) => Promise<string>;
 

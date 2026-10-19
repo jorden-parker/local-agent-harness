@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { truncateToolOutput } from "../../src/tools/toolOutput.js";
+import { truncateToolOutput } from "../../src/tools/tool-output.js";
 
 describe("truncateToolOutput", () => {
   it("leaves short output alone", () => {

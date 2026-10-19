@@ -1,7 +1,7 @@
 import { isCancel, selectKey } from "@clack/prompts";
 import pc from "picocolors";
-import type { ConfirmationChoice } from "../run/runState.js";
-import { describeToolCall, type ToolCall } from "../tools/toolCall.js";
+import type { ConfirmationChoice } from "../run/run-state.js";
+import { describeToolCall, type ToolCall } from "../tools/tool-call.js";
 import type { Confirmer } from "./confirmer.js";
 
 export class TerminalConfirmer implements Confirmer {

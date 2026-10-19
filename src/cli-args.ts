@@ -1,22 +1,22 @@
 import { parseArgs } from "node:util";
-import type { RunOptions } from "./run/runLoop.js";
+import type { RunOptions } from "./run/run-loop.js";
 
 export interface CliArgs {
   task: string;
-  model: string;
+  model: string | undefined;
   backend: string;
   allowDirty: boolean;
   runOptions: Omit<RunOptions, "target" | "model">;
 }
 
-const USAGE = `usage: harness "task" [--model qwen3:8b] [--backend http://localhost:11434] [--yolo] [--allow-secrets] [--allow-dirty] [--think] [--num-ctx 32768] [--max-iterations 50] [--timeout-minutes 20]`;
+const USAGE = `usage: harness "task" [--model <name>] [--backend http://localhost:11434] [--yolo] [--allow-secrets] [--allow-dirty] [--think] [--num-ctx 32768] [--max-iterations 50] [--timeout-minutes 20]`;
 
 export function parseCliArgs(argv: string[]): CliArgs {
   const { values, positionals } = parseArgs({
     args: argv,
     allowPositionals: true,
     options: {
-      model: { type: "string", default: "qwen3:8b" },
+      model: { type: "string" },
       backend: { type: "string", default: "http://localhost:11434" },
       yolo: { type: "boolean", default: false },
       "allow-secrets": { type: "boolean", default: false },

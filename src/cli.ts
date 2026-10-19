@@ -1,26 +1,28 @@
 import pc from "picocolors";
-import { OllamaBackend } from "./backend/ollamaBackend.js";
-import { parseCliArgs } from "./cliArgs.js";
-import { assertBackendAllowed } from "./config/backendUrl.js";
-import { loadUserConfig } from "./config/userConfig.js";
-import { TerminalConfirmer } from "./gate/terminalConfirmer.js";
-import { prepareTargetDirectory } from "./git/targetDirectory.js";
-import { openRunLog } from "./log/runLog.js";
-import { buildSystemPrompt } from "./prompt/systemPrompt.js";
-import { runTask } from "./run/runLoop.js";
+import { OllamaBackend } from "./backend/ollama-backend.js";
+import { parseCliArgs } from "./cli-args.js";
+import { assertBackendAllowed } from "./config/backend-url.js";
+import { chooseModel } from "./config/model-choice.js";
+import { loadUserConfig } from "./config/user-config.js";
+import { TerminalConfirmer } from "./gate/terminal-confirmer.js";
+import { prepareTargetDirectory } from "./git/target-directory.js";
+import { openRunLog } from "./log/run-log.js";
+import { buildSystemPrompt } from "./prompt/system-prompt.js";
+import { runTask } from "./run/run-loop.js";
 
 async function main(): Promise<void> {
   const args = parseCliArgs(process.argv.slice(2));
   const config = await loadUserConfig();
+  const model = chooseModel(args.model, config.defaultModel);
   const backendUrl = assertBackendAllowed(args.backend, config.allowedBackendHosts);
   const target = await prepareTargetDirectory(process.cwd(), args.allowDirty);
   const log = await openRunLog(target, new Date());
   const systemPrompt = await buildSystemPrompt(target);
-  process.stdout.write(pc.dim(`model ${args.model} via ${backendUrl}, log ${log.path}\n\n`));
+  process.stdout.write(pc.dim(`model ${model} via ${backendUrl}, log ${log.path}\n\n`));
   const result = await runTask(
     args.task,
     systemPrompt,
-    { ...args.runOptions, target, model: args.model },
+    { ...args.runOptions, target, model },
     {
       backend: new OllamaBackend(backendUrl),
       confirmer: new TerminalConfirmer(),

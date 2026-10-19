@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseOllamaLine } from "../../src/backend/ollamaChunks.js";
+import { parseOllamaLine } from "../../src/backend/ollama-chunks.js";
 
 describe("parseOllamaLine", () => {
   it("yields text for content chunks", () => {

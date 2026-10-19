@@ -1,4 +1,4 @@
-import { isToolName, type ToolCall } from "../tools/toolCall.js";
+import { isToolName, type ToolCall } from "../tools/tool-call.js";
 import type { ChatChunk } from "./backend.js";
 
 interface OllamaToolCall {

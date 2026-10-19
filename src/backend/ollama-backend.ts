@@ -1,5 +1,5 @@
 import type { Backend, ChatChunk, ChatRequest } from "./backend.js";
-import { parseOllamaLine } from "./ollamaChunks.js";
+import { parseOllamaLine } from "./ollama-chunks.js";
 
 export class OllamaBackend implements Backend {
   constructor(private readonly baseUrl: string) {}

@@ -1,5 +1,5 @@
 import { confinementError, type ConfinementFlags } from "../tools/confinement.js";
-import type { ToolCall, ToolName } from "../tools/toolCall.js";
+import type { ToolCall, ToolName } from "../tools/tool-call.js";
 
 export interface RunLimits {
   maxIterations: number;

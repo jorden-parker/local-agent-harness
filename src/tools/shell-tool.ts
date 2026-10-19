@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
-import { ToolError } from "./targetPath.js";
-import { stringArgument, type ToolCall } from "./toolCall.js";
+import { ToolError } from "./target-path.js";
+import { stringArgument, type ToolCall } from "./tool-call.js";
 
 const SHELL_TIMEOUT_MS = 120_000;
 

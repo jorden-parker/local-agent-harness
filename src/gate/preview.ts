@@ -1,8 +1,8 @@
 import { createTwoFilesPatch } from "diff";
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { applyEdit } from "../tools/fileTools.js";
-import { stringArgument, type ToolCall } from "../tools/toolCall.js";
+import { applyEdit } from "../tools/file-tools.js";
+import { stringArgument, type ToolCall } from "../tools/tool-call.js";
 
 const MAX_PREVIEW_LINES = 80;
 

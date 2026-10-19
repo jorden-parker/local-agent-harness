@@ -1,7 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
-import { resolveInsideTarget, ToolError } from "./targetPath.js";
-import { stringArgument, type ToolCall } from "./toolCall.js";
+import { resolveInsideTarget, ToolError } from "./target-path.js";
+import { stringArgument, type ToolCall } from "./tool-call.js";
 
 export async function readTool(target: string, call: ToolCall): Promise<string> {
   const path = await resolveInsideTarget(target, stringArgument(call, "path"));

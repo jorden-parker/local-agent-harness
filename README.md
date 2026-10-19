@@ -16,7 +16,7 @@ Flags:
 
 | Flag                | Default                  | Meaning                                                   |
 | ------------------- | ------------------------ | --------------------------------------------------------- |
-| `--model`           | `qwen3:8b`               | Any Ollama model with tool support, e.g. `qwen3.8:27b`    |
+| `--model`           | see below                | Any Ollama model with tool support, e.g. `qwen3.8:27b`    |
 | `--backend`         | `http://localhost:11434` | Ollama URL; non-local hosts must be allow-listed          |
 | `--yolo`            | off                      | Skip the y / n / a confirmation gate                      |
 | `--allow-secrets`   | off                      | Let the model read `.env*`, `*.pem`, keys and credentials |
@@ -25,6 +25,14 @@ Flags:
 | `--num-ctx`         | `32768`                  | Context window passed to Ollama                           |
 | `--max-iterations`  | `50`                     | Hard cap on tool calls per run                            |
 | `--timeout-minutes` | `20`                     | Wall-clock cap per run                                    |
+
+Without `--model`, the harness uses `defaultModel` from `~/.config/harness/config.json`, falling back to `qwen3:8b`. Set it per machine to whatever that machine has pulled:
+
+```json
+{ "defaultModel": "qwen3:4b-instruct-2507-q4_K_M" }
+```
+
+Prefer instruct builds. Thinking-only builds such as the current `qwen3:4b` tag ignore `--think` being off and reason at length before every tool call.
 
 Every run writes a JSONL log to `.harness/runs/` inside the target repo. The folder ignores itself, so nothing lands in git.
 

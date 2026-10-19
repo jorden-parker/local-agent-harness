@@ -1,6 +1,6 @@
 import { glob, readFile } from "node:fs/promises";
 import { relative } from "node:path";
-import { stringArgument, type ToolCall } from "./toolCall.js";
+import { stringArgument, type ToolCall } from "./tool-call.js";
 
 const IGNORED = ["**/node_modules/**", "**/.git/**", "**/.harness/**"];
 const MAX_MATCHES = 500;
