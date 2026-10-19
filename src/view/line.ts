@@ -4,6 +4,9 @@ export interface Span {
   dim?: boolean;
   italic?: boolean;
   bold?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
+  background?: string;
 }
 
 export interface Line {
@@ -20,7 +23,7 @@ export const SPACING = {
   footerGap: 1,
   ruleWidth: 60,
   toolOutputCap: 8,
-  previewCap: 80,
+  liveStreamRows: 4,
 } as const;
 
 export const INDENT: Span = { text: " ".repeat(SPACING.textColumn) };
@@ -40,13 +43,6 @@ export function blankLinesBefore(previous: BlockKind | undefined, next: BlockKin
 
 export function blankLines(count: number): Line[] {
   return Array.from({ length: count }, () => BLANK);
-}
-
-export function markedLines(marker: Span, text: string, style: Omit<Span, "text"> = {}): Line[] {
-  return text.split("\n").map((row, index) => ({
-    gutter: [index === 0 ? marker : INDENT],
-    body: [{ text: row === "" ? " " : row, ...style }],
-  }));
 }
 
 export function gutterOnlyLine(span: Span): Line {

@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { markedLines, REPLY_MARKER, type Line } from "../../src/view/line.js";
+import { REPLY_MARKER, type Line } from "../../src/view/line.js";
 import { wrapLine } from "../../src/view/wrap-line.js";
 import { linesText } from "./line-text.js";
 
-const reply = (text: string): Line =>
-  markedLines(REPLY_MARKER, text)[0] ?? { gutter: [], body: [] };
+const reply = (text: string): Line => ({ gutter: [REPLY_MARKER], body: [{ text }] });
 
 describe("wrapLine", () => {
   it("leaves a row that fits alone", () => {

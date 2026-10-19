@@ -6,7 +6,8 @@ import { Footer } from "../../../src/view/ink/footer.js";
 import { LineView } from "../../../src/view/ink/line-view.js";
 import { RunApp } from "../../../src/view/ink/run-app.js";
 import { Transcript } from "../../../src/view/ink/transcript.js";
-import { markedLines, REPLY_MARKER } from "../../../src/view/line.js";
+import { REPLY_MARKER } from "../../../src/view/line.js";
+import { markdownLines } from "../../../src/view/markdown-lines.js";
 import { RunStore } from "../../../src/view/run-store.js";
 
 const readCall: ToolCall = { id: "1", name: "read", arguments: { path: "a.txt" } };
@@ -18,7 +19,7 @@ const noInput = (): void => undefined;
 
 describe("LineView", () => {
   it("hangs wrapped text at the text column", () => {
-    const [line] = markedLines(REPLY_MARKER, "alpha beta gamma delta epsilon");
+    const [line] = markdownLines(REPLY_MARKER, "alpha beta gamma delta epsilon");
     const output = line
       ? renderToString(<LineView line={line} columns={16} />, { columns: 16 })
       : "";

@@ -9,7 +9,7 @@ interface Piece {
 }
 
 export function wrapLine(line: Line, columns: number): Line[] {
-  const gutterWidth = width(line.gutter.map((span) => span.text).join(""));
+  const gutterWidth = textWidth(line.gutter.map((span) => span.text).join(""));
   const bodyWidth = Math.max(1, columns - gutterWidth);
   const rows = fillRows(pieces(line.body, bodyWidth), bodyWidth);
   const hanging: Span[] = [{ text: " ".repeat(gutterWidth) }];
@@ -39,7 +39,7 @@ function fillRows(all: Piece[], bodyWidth: number): Span[][] {
   const rows: Piece[][] = [[]];
   let used = 0;
   for (const piece of all) {
-    const pieceWidth = width(piece.text);
+    const pieceWidth = textWidth(piece.text);
     if (used + pieceWidth > bodyWidth && used > 0) {
       rows.push([]);
       used = 0;
@@ -66,6 +66,6 @@ function mergeSpans(row: Piece[]): Span[] {
   return merged.length === 0 ? [{ text: " " }] : merged;
 }
 
-function width(text: string): number {
+export function textWidth(text: string): number {
   return Array.from(graphemes.segment(text)).length;
 }

@@ -4,7 +4,6 @@ import type { ToolOutcome } from "../tools/execute-tool.js";
 import { describeToolCall, type ToolCall, type ToolName } from "../tools/tool-call.js";
 import {
   INDENT,
-  markedLines,
   REPLY_MARKER,
   RULE_GUTTER,
   SPACING,
@@ -13,6 +12,7 @@ import {
   type Line,
   type Span,
 } from "./line.js";
+import { inlineMarkdownRows, markdownLines } from "./markdown-lines.js";
 
 export interface Toggles {
   thinking: boolean;
@@ -52,7 +52,7 @@ const BLOCK_RENDERERS: BlockRenderers = {
   header: headerLines,
   task: (block) => taskLines(block.text),
   thinking: (block, toggles) => thinkingLines(block.text, toggles.thinking),
-  reply: (block) => markedLines(REPLY_MARKER, block.text),
+  reply: (block) => markdownLines(REPLY_MARKER, block.text),
   tool: (block, toggles) => toolLines(block, toggles.toolOutput),
   gate: gateLines,
   summary: summaryLines,
@@ -76,8 +76,8 @@ export function previewLines(preview: string): Line[] {
 
 export function streamLines(kind: "thinking" | "reply", text: string): Line[] {
   return kind === "thinking"
-    ? markedLines(THINKING_MARKER, text, THINKING_STYLE)
-    : markedLines(REPLY_MARKER, text);
+    ? markdownLines(THINKING_MARKER, text, THINKING_STYLE)
+    : markdownLines(REPLY_MARKER, text);
 }
 
 function headerLines(block: BlockOf<"header">): Line[] {
@@ -96,9 +96,9 @@ function headerLines(block: BlockOf<"header">): Line[] {
 }
 
 function taskLines(text: string): Line[] {
-  return text.split("\n").map((row, index) => ({
+  return inlineMarkdownRows(text, { color: "whiteBright" }).map((body, index) => ({
     gutter: [index === 0 ? { text: "> ", color: "cyan", bold: true } : INDENT],
-    body: [{ text: row, color: "whiteBright" }],
+    body: body.length === 0 ? [{ text: " " }] : body,
     band: true,
   }));
 }

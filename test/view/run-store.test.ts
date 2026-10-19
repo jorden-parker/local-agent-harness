@@ -27,19 +27,22 @@ function readTool(store: RunStore, output = "x\n"): void {
 }
 
 describe("RunStore streaming", () => {
-  it("commits finished rows and keeps the partial row live", () => {
+  it("commits finished markdown blocks and keeps the open block live", () => {
     const store = new RunStore();
     store.startWaiting(0);
-    store.streamText("reply", "one\ntw");
-    expect(committed(store)).toEqual(["● one"]);
-    expect(store.getSnapshot().live).toMatchObject({
-      kind: "stream",
-      text: "one\ntw",
-      committedRows: 1,
-    });
+    store.streamText("reply", "one\n\ntw");
+    expect(committed(store)).toEqual(["● one", "   "]);
+    expect(store.getSnapshot().live).toMatchObject({ kind: "stream", committedRows: 2 });
     store.endReply();
-    expect(committed(store)).toEqual(["● one", "  tw"]);
+    expect(committed(store)).toEqual(["● one", "   ", "  tw"]);
     expect(store.getSnapshot().live).toEqual({ kind: "idle" });
+  });
+
+  it("commits the oldest rows of an open block once it outgrows the live budget", () => {
+    const store = new RunStore();
+    store.startWaiting(0);
+    store.streamText("reply", "1\n2\n3\n4\n5\n6");
+    expect(committed(store)).toEqual(["● 1", "  2"]);
   });
 
   it("drops blank lines the model sends before its text", () => {

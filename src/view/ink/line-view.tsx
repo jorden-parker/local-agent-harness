@@ -10,6 +10,9 @@ function spanProps(span: Span) {
     dimColor: span.dim === true,
     italic: span.italic === true,
     bold: span.bold === true,
+    underline: span.underline === true,
+    strikethrough: span.strikethrough === true,
+    ...(span.background === undefined ? {} : { backgroundColor: span.background }),
   };
 }
 

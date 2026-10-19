@@ -6,7 +6,8 @@ import {
   type GatePrompt,
   type Toggles,
 } from "./block-lines.js";
-import { blankLines, blankLinesBefore, type BlockKind, type Line } from "./line.js";
+import { blankLines, blankLinesBefore, SPACING, type BlockKind, type Line } from "./line.js";
+import { settledMarkdownRows } from "./markdown-lines.js";
 import { gateQuestionLines, pendingGateLines, type Live, type StreamKind } from "./live-lines.js";
 import { CHOICE_ORDER } from "../gate/confirmation-keys.js";
 
@@ -141,7 +142,9 @@ export class RunStore {
 
   private commitFinishedRows(stream: StreamKind, text: string, committedRows: number): number {
     if (!this.isShown(stream)) return committedRows;
-    const finished = streamLines(stream, text).slice(committedRows, -1);
+    const rows = streamLines(stream, text);
+    const settled = Math.max(settledMarkdownRows(text), rows.length - SPACING.liveStreamRows);
+    const finished = rows.slice(committedRows, Math.max(committedRows, settled));
     this.commit(finished);
     return committedRows + finished.length;
   }
