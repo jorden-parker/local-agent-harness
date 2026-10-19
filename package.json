@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "diff": "^9.0.0",
-    "picocolors": "^1.1.1"
+    "ink": "8.0.0",
+    "picocolors": "^1.1.1",
+    "react": "19.3.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
@@ -28,6 +30,7 @@
     "@eslint/js": "^10.0.1",
     "@types/diff": "^8.0.0",
     "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "husky": "^9.1.7",

@@ -1,29 +1,53 @@
+import type { Key } from "ink";
 import { describe, expect, it } from "vitest";
-import { readConfirmationKey } from "../../src/gate/confirmation-keys.js";
+import { readGateKey } from "../../src/gate/confirmation-keys.js";
 
-describe("readConfirmationKey", () => {
+const NO_KEY: Key = {
+  upArrow: false,
+  downArrow: false,
+  leftArrow: false,
+  rightArrow: false,
+  pageDown: false,
+  pageUp: false,
+  home: false,
+  end: false,
+  return: false,
+  escape: false,
+  ctrl: false,
+  shift: false,
+  tab: false,
+  backspace: false,
+  delete: false,
+  meta: false,
+  super: false,
+  hyper: false,
+  capsLock: false,
+  numLock: false,
+};
+const press = (overrides: Partial<Key>): Key => ({ ...NO_KEY, ...overrides });
+
+describe("readGateKey", () => {
   it("answers straight away on y, n and a", () => {
-    expect(readConfirmationKey(0, { name: "y" }).choice).toBe("y");
-    expect(readConfirmationKey(0, { name: "n" }).choice).toBe("n");
-    expect(readConfirmationKey(0, { name: "a" }).choice).toBe("a");
+    expect(readGateKey("y", NO_KEY)).toEqual({ kind: "answer", choice: "y" });
+    expect(readGateKey("n", NO_KEY)).toEqual({ kind: "answer", choice: "n" });
+    expect(readGateKey("a", NO_KEY)).toEqual({ kind: "answer", choice: "a" });
   });
 
   it("counts escape and ctrl+c as no", () => {
-    expect(readConfirmationKey(0, { name: "escape" }).choice).toBe("n");
-    expect(readConfirmationKey(0, { name: "c", ctrl: true }).choice).toBe("n");
+    expect(readGateKey("", press({ escape: true }))).toEqual({ kind: "answer", choice: "n" });
+    expect(readGateKey("c", press({ ctrl: true }))).toEqual({ kind: "answer", choice: "n" });
   });
 
-  it("moves the selection with the arrow keys and wraps around", () => {
-    expect(readConfirmationKey(0, { name: "down" })).toEqual({ selected: 1, choice: null });
-    expect(readConfirmationKey(0, { name: "up" })).toEqual({ selected: 2, choice: null });
-    expect(readConfirmationKey(2, { name: "down" })).toEqual({ selected: 0, choice: null });
+  it("moves the selection with the arrow keys", () => {
+    expect(readGateKey("", press({ downArrow: true }))).toEqual({ kind: "move", step: 1 });
+    expect(readGateKey("", press({ upArrow: true }))).toEqual({ kind: "move", step: -1 });
   });
 
-  it("answers with the selected option on enter", () => {
-    expect(readConfirmationKey(1, { name: "return" }).choice).toBe("n");
+  it("submits the selected option on enter", () => {
+    expect(readGateKey("", press({ return: true }))).toEqual({ kind: "submit" });
   });
 
   it("ignores other keys", () => {
-    expect(readConfirmationKey(1, { name: "x" })).toEqual({ selected: 1, choice: null });
+    expect(readGateKey("x", NO_KEY)).toEqual({ kind: "none" });
   });
 });
